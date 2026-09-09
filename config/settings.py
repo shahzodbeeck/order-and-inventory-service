@@ -13,6 +13,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "rest_framework",
     "rest_framework_simplejwt",
+    "drf_spectacular",
     "apps.products",
     "apps.orders",
     "apps.accounts",
@@ -74,6 +75,14 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
     ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Order and Inventory Service API",
+    "DESCRIPTION": "Mini marketplace uchun buyurtma va ombor servisi.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 SIMPLE_JWT = {
