@@ -2,12 +2,9 @@ from rest_framework import serializers
 
 
 class OrderItemInputSerializer(serializers.Serializer):
-    pass
+    product_id = serializers.UUIDField()
+    quantity = serializers.IntegerField(min_value=1)
 
 
 class OrderCreateSerializer(serializers.Serializer):
-    pass
-
-
-class OrderResponseSerializer(serializers.Serializer):
-    pass
+    items = OrderItemInputSerializer(many=True, allow_empty=False)

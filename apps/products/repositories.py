@@ -36,19 +36,21 @@ def get_product_by_id(product_id) -> dict | None:
         return _row_to_dict(cursor, row)
 
 
-def reserve_stock(product_id, quantity: int) -> bool:
+def reserve_stock(product_id, quantity: int) -> dict | None:
     with connection.cursor() as cursor:
         cursor.execute(
             """
             UPDATE products
             SET stock_quantity = stock_quantity - %s
             WHERE id = %s AND stock_quantity >= %s
-            RETURNING stock_quantity
+            RETURNING id, price, stock_quantity
             """,
             [quantity, product_id, quantity],
         )
         row = cursor.fetchone()
-        return row is not None
+        if row is None:
+            return None
+        return _row_to_dict(cursor, row)
 
 
 def release_stock(product_id, quantity: int) -> None:

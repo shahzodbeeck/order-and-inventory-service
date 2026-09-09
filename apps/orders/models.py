@@ -8,12 +8,14 @@ class Order(models.Model):
         ("cancelled", "cancelled"),
     )
 
-    user_id = models.BigIntegerField()
+    user_id = models.UUIDField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
-    idempotency_key = models.CharField(max_length=255, unique=True)
-    expires_at = models.DateTimeField()
+    total_price = models.DecimalField(max_digits=12, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    expires_at = models.DateTimeField(null=True)
+    confirmed_at = models.DateTimeField(null=True)
+    cancelled_at = models.DateTimeField(null=True)
 
     class Meta:
         managed = False
@@ -22,10 +24,9 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
-    product_id = models.BigIntegerField()
+    product_id = models.UUIDField()
     quantity = models.IntegerField()
-    price_at_order = models.DecimalField(max_digits=12, decimal_places=2)
-    created_at = models.DateTimeField(auto_now_add=True)
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2)
 
     class Meta:
         managed = False
