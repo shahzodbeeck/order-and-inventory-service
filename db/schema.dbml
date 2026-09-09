@@ -1,0 +1,28 @@
+
+Table products {
+  id bigserial [pk]
+  name varchar
+  price numeric
+  stock_quantity int
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Table orders {
+  id bigserial [pk]
+  user_id bigint
+  status varchar [note: 'pending | confirmed | cancelled']
+  idempotency_key varchar [unique]
+  expires_at timestamptz
+  created_at timestamptz
+  updated_at timestamptz
+}
+
+Table order_items {
+  id bigserial [pk]
+  order_id bigint [ref: > orders.id]
+  product_id bigint [ref: > products.id]
+  quantity int
+  price_at_order numeric
+  created_at timestamptz
+}
