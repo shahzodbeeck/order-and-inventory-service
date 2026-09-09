@@ -33,9 +33,7 @@ services:
   web:
     build: .
     restart: unless-stopped
-    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 4
-    volumes:
-      - .:/app
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 4 --preload
     ports:
       - "8080:8000"
     env_file:
@@ -50,8 +48,6 @@ services:
     build: .
     restart: unless-stopped
     command: celery -A config worker --loglevel=info
-    volumes:
-      - .:/app
     env_file:
       - .env
     depends_on:
@@ -64,8 +60,6 @@ services:
     build: .
     restart: unless-stopped
     command: celery -A config beat --loglevel=info
-    volumes:
-      - .:/app
     env_file:
       - .env
     depends_on:

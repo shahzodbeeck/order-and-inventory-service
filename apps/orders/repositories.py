@@ -40,7 +40,10 @@ def get_idempotency_record(user_id, idempotency_key: str) -> dict | None:
         row = cursor.fetchone()
         if row is None:
             return None
-        return _row_to_dict(cursor, row)
+        record = _row_to_dict(cursor, row)
+        if isinstance(record.get("response_body"), str):
+            record["response_body"] = json.loads(record["response_body"])
+        return record
 
 
 def complete_idempotency_key(record_id, order_id, response_code: int, response_body: dict) -> None:
@@ -161,6 +164,28 @@ def cancel_order(order_id) -> bool:
 
     for product_id, quantity in items:
         product_repositories.release_stock(product_id, quantity)
+
+    return True
+
+
+def confirm_order(order_id) -> bool:
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT status FROM orders WHERE id = %s FOR UPDATE",
+            [order_id],
+        )
+        row = cursor.fetchone()
+        if row is None or row[0] != "pending":
+            return False
+
+        cursor.execute(
+            """
+            UPDATE orders
+            SET status = 'confirmed', confirmed_at = now()
+            WHERE id = %s
+            """,
+            [order_id],
+        )
 
     return True
 

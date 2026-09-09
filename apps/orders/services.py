@@ -22,6 +22,10 @@ class OrderNotCancellableError(Exception):
     pass
 
 
+class OrderNotConfirmableError(Exception):
+    pass
+
+
 def _order_cache_key(order_id) -> str:
     return f"order:{order_id}"
 
@@ -101,6 +105,17 @@ def cancel_order(order_id) -> dict:
     cancelled = repositories.cancel_order(order_id)
     if not cancelled:
         raise OrderNotCancellableError
+
+    cache.delete(_order_cache_key(order_id))
+
+    order = repositories.get_order_with_items(order_id)
+    return _serialize_order(order)
+
+
+def confirm_order(order_id) -> dict:
+    confirmed = repositories.confirm_order(order_id)
+    if not confirmed:
+        raise OrderNotConfirmableError
 
     cache.delete(_order_cache_key(order_id))
 

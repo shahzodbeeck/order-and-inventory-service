@@ -8,7 +8,7 @@ class ProductCreateSerializer(serializers.Serializer):
 
 
 class ProductResponseSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
+    id = serializers.UUIDField()
     name = serializers.CharField()
     price = serializers.DecimalField(max_digits=12, decimal_places=2)
     stock_quantity = serializers.IntegerField()

@@ -46,6 +46,18 @@ class OrderDetailView(APIView):
         return Response(order, status=status.HTTP_200_OK)
 
 
+class OrderConfirmView(APIView):
+    def post(self, request, order_id):
+        try:
+            order = services.confirm_order(order_id)
+        except services.OrderNotConfirmableError:
+            return Response(
+                {"detail": "Order cannot be confirmed (not pending or not found)"},
+                status=status.HTTP_409_CONFLICT,
+            )
+        return Response(order, status=status.HTTP_200_OK)
+
+
 class OrderCancelView(APIView):
     def post(self, request, order_id):
         try:
