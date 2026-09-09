@@ -1,6 +1,3 @@
-# managed=False — jadvallar db/schema.sql orqali yaratiladi.
-# Business query'lar repositories.py da raw SQL bilan yoziladi.
-
 from django.db import models
 
 

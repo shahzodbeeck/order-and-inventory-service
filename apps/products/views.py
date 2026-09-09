@@ -1,6 +1,3 @@
-"""Handler/controller qatlami — faqat request parse, service chaqirish,
-response qaytarish. Business logika bu yerda bo'lmasligi kerak."""
-
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
 from rest_framework.response import Response
@@ -11,8 +8,6 @@ from .serializers import ProductCreateSerializer, ProductResponseSerializer
 
 
 class ProductListCreateView(APIView):
-    """POST /products"""
-
     def post(self, request):
         serializer = ProductCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -24,9 +19,7 @@ class ProductListCreateView(APIView):
 
 
 class ProductDetailView(APIView):
-    """GET /products/{id}"""
-
-    def get(self, request, product_id: int):
+    def get(self, request, product_id):
         try:
             product = services.get_product(product_id)
         except ObjectDoesNotExist:

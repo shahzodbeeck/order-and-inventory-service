@@ -1,28 +1,61 @@
+Table users {
+  id uuid [pk, default: `gen_random_uuid()`]
+  email citext [unique, not null]
+  password_hash text [not null]
+  created_at timestamptz [not null, default: `now()`]
+}
 
 Table products {
-  id bigserial [pk]
-  name varchar
-  price numeric
-  stock_quantity int
-  created_at timestamptz
-  updated_at timestamptz
+  id uuid [pk, default: `gen_random_uuid()`]
+  name text [not null]
+  price numeric [not null, note: 'CHECK price > 0']
+  stock_quantity int [not null, note: 'CHECK stock_quantity >= 0']
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`, note: 'auto-updated via trigger']
 }
 
 Table orders {
-  id bigserial [pk]
-  user_id bigint
-  status varchar [note: 'pending | confirmed | cancelled']
-  idempotency_key varchar [unique]
-  expires_at timestamptz
-  created_at timestamptz
-  updated_at timestamptz
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [not null, ref: > users.id]
+  status text [not null, default: 'pending', note: 'pending | confirmed | cancelled']
+  total_price numeric [not null, note: 'CHECK total_price >= 0']
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`]
+  expires_at timestamptz [note: 'required while pending']
+  confirmed_at timestamptz [note: 'required when confirmed']
+  cancelled_at timestamptz [note: 'required when cancelled']
+
+  indexes {
+    (expires_at) [name: 'idx_orders_pending_expires']
+    user_id
+  }
 }
 
 Table order_items {
-  id bigserial [pk]
-  order_id bigint [ref: > orders.id]
-  product_id bigint [ref: > products.id]
-  quantity int
-  price_at_order numeric
-  created_at timestamptz
+  id uuid [pk, default: `gen_random_uuid()`]
+  order_id uuid [not null, ref: > orders.id]
+  product_id uuid [not null, ref: > products.id]
+  quantity int [not null, note: 'CHECK quantity > 0']
+  unit_price numeric [not null, note: 'CHECK unit_price > 0']
+
+  indexes {
+    (order_id, product_id) [unique]
+    product_id
+  }
+}
+
+Table idempotency_keys {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [not null, ref: > users.id]
+  idempotency_key text [not null]
+  status text [not null, default: 'processing', note: 'processing | completed']
+  order_id uuid [ref: > orders.id]
+  response_code int
+  response_body jsonb
+  created_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    (user_id, idempotency_key) [unique]
+    order_id
+  }
 }

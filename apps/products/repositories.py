@@ -1,10 +1,3 @@
-"""Products uchun raw SQL repository qatlami.
-
-Qoida: bu faylda faqat SQL va cursor ishlatiladi, hech qanday
-Django ORM query (Model.objects...) ishlatilmaydi.
-django.db.connection.cursor() dan foydalaning.
-"""
-
 from django.db import connection
 
 
@@ -27,7 +20,7 @@ def create_product(name: str, price, stock_quantity: int) -> dict:
         return _row_to_dict(cursor, row)
 
 
-def get_product_by_id(product_id: int) -> dict | None:
+def get_product_by_id(product_id) -> dict | None:
     with connection.cursor() as cursor:
         cursor.execute(
             """
@@ -43,13 +36,7 @@ def get_product_by_id(product_id: int) -> dict | None:
         return _row_to_dict(cursor, row)
 
 
-def reserve_stock(product_id: int, quantity: int) -> bool:
-    """Concurrency-safe stock kamaytirish — atomik conditional UPDATE.
-
-    Bitta UPDATE statement o'zi atomik bo'lgani uchun alohida
-    SELECT ... FOR UPDATE kerak emas. Agar RETURNING natija bo'sh
-    bo'lsa (0 rows), stock yetarli emas.
-    """
+def reserve_stock(product_id, quantity: int) -> bool:
     with connection.cursor() as cursor:
         cursor.execute(
             """
@@ -64,7 +51,7 @@ def reserve_stock(product_id: int, quantity: int) -> bool:
         return row is not None
 
 
-def release_stock(product_id: int, quantity: int) -> None:
+def release_stock(product_id, quantity: int) -> None:
     with connection.cursor() as cursor:
         cursor.execute(
             """

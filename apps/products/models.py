@@ -1,8 +1,3 @@
-# Bu model ORM query uchun emas, faqat Django admin/introspection va
-# migration state uchun. Barcha CRUD/business query'lar repositories.py
-# ichida raw SQL bilan yoziladi (managed=False -> migration jadval yaratmaydi,
-# jadval db/schema.sql orqali yaratiladi).
-
 from django.db import models
 
 
